@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AnimatedCollectionViewLayout",
+        "repositoryURL": "https://github.com/KelvinJin/AnimatedCollectionViewLayout.git",
+        "state": {
+          "branch": null,
+          "revision": "07fb5eaed045ab8a2e0890a63e55fbe870c5fefc",
+          "version": "1.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
