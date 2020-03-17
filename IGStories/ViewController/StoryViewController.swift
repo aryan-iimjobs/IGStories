@@ -28,11 +28,9 @@ class StoryViewController: UIViewController {
         return uiView
     }()
     
-    private var story_copy: StoryPreviewModel?
-    
     let collectionView: UICollectionView = {
         let layout = AnimatedCollectionViewLayout()
-        layout.animator = CubeAttributesAnimator(perspective: -1/500, totalAngle: .pi/2)
+        layout.animator = CubeAttributesAnimator(perspective: -1/100, totalAngle: .pi/12)
         layout.scrollDirection = .horizontal;
         let cv = UICollectionView(frame: CGRect(x: 0,y: 0,width: UIScreen.main.bounds.width,height:  UIScreen.main.bounds.height), collectionViewLayout: layout);
         cv.register(StoryCell.self, forCellWithReuseIdentifier: "cell")
@@ -60,6 +58,10 @@ class StoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
+        //handel moving to background
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.willResignActiveNotification, object: nil)
+        
         view.addSubview(collectionView)
         collectionView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true;
         collectionView.rightAnchor.constraint(equalTo:  view.rightAnchor).isActive = true;
@@ -67,6 +69,7 @@ class StoryViewController: UIViewController {
         collectionView.bottomAnchor.constraint(equalTo:  view.bottomAnchor).isActive = true;
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.backgroundColor = .none
         collectionView.decelerationRate = .fast
         collectionView.layer.cornerRadius = 10
         
@@ -74,14 +77,15 @@ class StoryViewController: UIViewController {
         view.addGestureRecognizer(recognizer)
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        self.topSafeAreaMargin = view.safeAreaInsets.top
+    @objc func appMovedToBackground() {
+        print("StoryVC: moved to background")
+        let cell = self.collectionView.visibleCells[0] as! StoryCell
+        cell.progressBar.pause()
+        cell.pauseIv.isHidden = false
     }
     
     @objc func swipeDown(_ sender: UIPanGestureRecognizer) {
         let touchPoint = sender.location(in: self.view?.window)
-
         if sender.state == UIGestureRecognizer.State.began {
             initialTouchPoint = touchPoint
         } else if sender.state == UIGestureRecognizer.State.changed {
@@ -100,6 +104,11 @@ class StoryViewController: UIViewController {
             }
         }
     }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        self.topSafeAreaMargin = view.safeAreaInsets.top
+    }
         
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -109,7 +118,7 @@ class StoryViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        print("viewWillDisappear")
+        print("StoryVC: viewWillDisappear")
         if let firstVC = presentingViewController as? ViewController {
             firstVC.isDarkStatusBar.toggle()
         }
@@ -174,6 +183,7 @@ extension StoryViewController: UICollectionViewDelegateFlowLayout {
 //MARK:- Handle progressView when scrolling over stories
     //not called when programmatically scrolling, like on tap/auto
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.collectionView.isUserInteractionEnabled = true
         var cell: StoryCell
         let visibleCells = collectionView.visibleCells
         
@@ -192,9 +202,20 @@ extension StoryViewController: UICollectionViewDelegateFlowLayout {
         }
     }
     
+    //disable user interaction when scrolling fast using taps **
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print("StoryVC: didScroll")
+        if self.selectedStoryIndex != 0 && self.firstLaunch {
+            //do nothing
+        } else {
+            self.collectionView.isUserInteractionEnabled = false
+        }
+    }
+    
 //MARK:- Handle progressView when auto/tap scroll over stories
     //not called when scrolling over cells(stories)
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.collectionView.isUserInteractionEnabled = true
         var cell: StoryCell
         let visibleCells = collectionView.visibleCells
         
@@ -225,6 +246,7 @@ extension StoryViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         print("StoryVC: endedDisplay of \(indexPath.item)")
         let oldCell = cell as! StoryCell
+        oldCell.pauseIv.isHidden = true
         oldCell.progressBar.resetBar()
     }
 }
@@ -251,5 +273,10 @@ extension StoryViewController: StoryPreviewProtocol {
             print("StoryVC: exit from left")
             self.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    func didTapCloseButton(from storyIndex: Int) {
+        print("StoryVC: cancelBtn pressed")
+        self.dismiss(animated: true, completion: nil)
     }
 }

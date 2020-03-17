@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     let TEST_DATA_COUNT = 5
-    let COLLECTION_VIEW_HEIGHT = CGFloat(100)
+    let COLLECTION_VIEW_HEIGHT = CGFloat(90)
 
     var arrayDemoIcons = ["logo0", "logo1", "logo2", "logo3", "logo4"]
     var arrayDemoSnaps = [["image0", "image1"], ["image2", "image3"], ["image4","image0"], ["image1", "image2"], ["image3","image4"]]
@@ -78,9 +78,9 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! StoryIconCell
         
-        cell.icon.layer.borderColor = UIColor.green.cgColor
-        cell.icon.layer.borderWidth = 2
-        cell.icon.image = UIImage(named: arrayStories[indexPath.item].image)!.imageWithInsets(insets: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20))
+        cell.icon.layer.borderColor = UIColor.blue.cgColor
+        cell.icon.layer.borderWidth = 1
+        cell.icon.image = UIImage(named: arrayStories[indexPath.item].image)!.imageWithInsets(insets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         
         cell.label.text = arrayStories[indexPath.item].title
         

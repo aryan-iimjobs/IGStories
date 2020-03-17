@@ -46,16 +46,16 @@ class MyProgressView: UIView {
         super.layoutSubviews()
         if hasDoneLayout { return }
         
-        let width = (frame.width - (padding * CGFloat(arrayBars.count - 1)) ) / CGFloat(arrayBars.count)
+        let width = (frame.width - ((padding) * CGFloat(arrayBars.count - 1)) - 16) / CGFloat(arrayBars.count)
         
         for (index, progressBar) in arrayBars.enumerated() {
             
-            let segFrame = CGRect(x: CGFloat(index) * (width + padding), y: 0, width: width, height: 20)
+            let segFrame = CGRect(x: (CGFloat(index) * (width + padding)) + 8, y: 0, width: width, height: 20)
             progressBar.frame = segFrame
             
             progressBar.progress = 0.0
             
-            progressBar.transform = progressBar.transform.scaledBy(x: 1, y: 2.5)
+            progressBar.transform = progressBar.transform.scaledBy(x: 1, y: 2)
             
             progressBar.tintColor = .white
             progressBar.backgroundColor = UIColor.lightGray
@@ -76,7 +76,7 @@ class MyProgressView: UIView {
         
         let progressBar = arrayBars[selectdStoryIndex]
         progressBar.progress += 0.005
-        progressBar.setProgress(progressBar.progress, animated: true)
+        progressBar.setProgress(progressBar.progress, animated: false)
         
         
         if  progressBar.progress == 1.0 {
@@ -102,15 +102,19 @@ class MyProgressView: UIView {
     }
     
     func pause() {
+        if !paused{
+            paused = true
+            print("PV: pause")
+            self.timer?.invalidate()
+        }
+    }
+    
+    func resume() {
         if paused {
             // resume
             paused = false
             print("PV: resume")
             self.animate(index: currentAnimationIndex)
-        } else {
-            paused = true
-            print("PV: pause")
-            self.timer?.invalidate()
         }
     }
     

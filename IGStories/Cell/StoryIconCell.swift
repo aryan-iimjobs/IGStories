@@ -21,6 +21,8 @@ class StoryIconCell: UICollectionViewCell {
     let label: UILabel = {
         let l = UILabel()
         l.textAlignment = .center
+        l.textColor = .gray
+        l.font = UIFont(name: "HelveticaNeue",size: 15.0)
         return l
     }()
     
@@ -31,7 +33,7 @@ class StoryIconCell: UICollectionViewCell {
         icon.layer.cornerRadius = frame.width / 2
         addSubview(icon)
         
-        label.frame = CGRect(x: 0, y: frame.width, width: frame.width, height: frame.height - frame.width)
+        label.frame = CGRect(x: 0, y: frame.width + 5, width: frame.width, height: frame.height - frame.width - 5)
         addSubview(label)
     }
     
